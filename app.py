@@ -22,6 +22,27 @@ db.create_all()
 db.session.commit()
 
 
+@app.route('/delete_composition/<id>')
+def delete_composition(id):
+    dl = db.session.query(Composition).get(id)
+    db.session.delete(dl)
+    db.session.commit()
+    return redirect('/index')
+
+@app.route('/delete_composer/<name>')
+def delete_composer(name):
+    delete_list = Composition.query.filter_by(composer=name).all()
+    for delete1 in delete_list:
+        db.session.query(Composition).get(delete1.id)
+        db.session.delete(delete1)
+        db.session.commit()
+
+    delete = db.session.query(Composer).get(name)
+    db.session.delete(delete)
+    db.session.commit()
+    return redirect('/index')
+
+
 @app.route('/')
 @app.route('/index', methods=['GET', 'POST'])
 def index():
@@ -62,28 +83,7 @@ def index():
                 return redirect('/index')
             message = "COMPOSER DOESN'T EXIST! FIRST OF ALL CREATE COMPOSER!"
 
-    return render_template('index.html', message=message, composer_posts=composer_posts, composition_posts=composition_posts)
-
-
-@app.route('/delete_composition/<id>')
-def delete_composition(id):
-    dl = db.session.query(Composition).get(id)
-    db.session.delete(dl)
-    db.session.commit()
-    return redirect('/index')
-
-@app.route('/delete_composer/<name>')
-def delete_composer(name):
-    delete_list = Composition.query.filter_by(composer=name).all()
-    for delete1 in delete_list:
-        db.session.query(Composition).get(delete1.id)
-        db.session.delete(delete1)
-        db.session.commit()
-
-    delete = db.session.query(Composer).get(name)
-    db.session.delete(delete)
-    db.session.commit()
-    return redirect('/index')
+    return render_template('index.html', composer_posts=composer_posts, composition_posts=composition_posts, message=message)
 
 
 if __name__=="__main__":
